@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+
+if [ -z "${MYSQL_USER}" ]; then
+    base_mariadb_image_default_user='mariadb'
+    export MYSQL_USER="${base_mariadb_image_default_user}"
+fi
+export DATABASE_URL="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}"
+
+mariadb_ready() {
+python << END
+import sys
+
+from MySQLdb import _mysql
+
+try:
+    _mysql.connect(
+        db="${MYSQL_DATABASE}",
+        user="${MYSQL_USER}",
+        passwd="${MYSQL_PASSWORD}",
+        host="${MYSQL_HOST}",
+        port=${MYSQL_PORT},
+    )
+except _mysql.OperationalError:
+    sys.exit(-1)
+sys.exit(0)
+
+END
+}
+until mariadb_ready; do
+  >&2 echo 'Waiting for MariaSQL to become available...'
+  sleep 1
+done
+>&2 echo 'MariaSQL is available'
+
+exec "$@"

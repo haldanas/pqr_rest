@@ -1,0 +1,4 @@
+# Django key
+DJANGO_SECRET_KEY=PB3aGvTmCkzaLGRAxDc3aMayKTPTDd5usT8gw4pCmKOk5AlJjh12pTrnNgQyOHCH
+DJANGO_EMAIL_USER=pruebasemailtest@gmail.com
+DJANGO_EMAIL_PASSWORD=pruebas1234

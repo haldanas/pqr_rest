@@ -1,0 +1,35 @@
+version: '3'
+
+volumes:
+  development_mariadb_data: {}
+  development_mariadb_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    image: apipqr_local_django
+    depends_on:
+      - mariadb
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.django
+      - ./.envs/.mariadb
+    ports:
+      - "8000:8000"
+    command: /start
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: ./compose/mariadb/Dockerfile
+    image: apipqr_production_mariadb
+    volumes:
+      - development_mariadb_data:/var/lib/mysql/data
+      - development_mariadb_data_backups:/backups
+    env_file:
+      - ./.envs/.mariadb
+    ports:
+      - "3306:3306"
